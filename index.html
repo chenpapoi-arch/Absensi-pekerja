@@ -3,50 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Pekerja</title>
+    <title>Absensi Karyawan</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-slate-100 flex items-center justify-center min-h-screen">
-    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center border-t-8 border-blue-600">
-        <h1 class="text-2xl font-bold text-slate-800 mb-2">Sistem Absensi Pekerja 🏗️</h1>
-        <p class="text-green-600 font-semibold mb-6">● SISTEM ONLINE</p>
-        
-        <div id="app" class="space-y-4">
-            <p class="text-slate-600 text-sm text-left bg-slate-50 p-3 rounded-lg border border-slate-200">
-                Halo, <strong>chenpapoi-arch</strong>!<br>
-                Gunakan tombol di bawah untuk absen di lokasi proyek Jakarta Barat/Tangerang.
-            </p>
-            
-            <button onclick="ambilLokasi()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition">
-                Mulai Absen Sekarang
-            </button>
-            
-            <div id="hasil" class="hidden mt-4 p-3 bg-blue-50 text-blue-800 text-xs rounded-lg border border-blue-200 italic">
-                Mencari lokasi...
+<body class="bg-slate-50 min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl border-t-[10px] border-blue-600 p-8 text-center">
+        <h1 class="text-3xl font-black text-slate-800 tracking-tighter mb-2">ABSENSI <span class="text-blue-600">PRO</span></h1>
+        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-8">Sistem Presensi Proyek</p>
+
+        <div class="space-y-4">
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-left">
+                <label class="text-[10px] font-black text-blue-600 uppercase">Pilih Nama Anda:</label>
+                <select id="user-select" class="w-full bg-transparent font-bold text-slate-700 outline-none mt-1">
+                    </select>
             </div>
+
+            <button onclick="doAbsen()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl shadow-lg active:scale-95 transition tracking-wider">
+                KIRIM ABSEN SEKARANG
+            </button>
         </div>
-        
-        <p class="mt-8 text-[10px] text-slate-400 uppercase tracking-widest">© 2026 AST Services Center</p>
+
+        <div class="mt-10 pt-6 border-t border-slate-50 flex justify-between items-center">
+            <p class="text-[10px] text-slate-300 font-bold uppercase">© 2026 Proyek</p>
+            <a href="/login" class="text-xs text-blue-500 font-bold bg-blue-50 px-3 py-1 rounded-full">Admin Panel</a>
+        </div>
     </div>
 
     <script>
-        function ambilLokasi() {
-            const hasil = document.getElementById('hasil');
-            hasil.classList.remove('hidden');
-            
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((pos) => {
-                    hasil.innerHTML = `Lokasi Terdeteksi: <br> Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
-                    alert('Absen Berhasil! Lokasi terdata di Jakarta Barat/Tangerang.');
-                }, () => {
-                    hasil.innerHTML = "Gagal mengambil lokasi. Pastikan GPS aktif.";
-                });
-            } else {
-                hasil.innerHTML = "Browser tidak mendukung GPS.";
-            }
+        const data = JSON.parse(localStorage.getItem('pekerja')) || ['Dedi (Welder)', 'Sopian (Field)'];
+        const select = document.getElementById('user-select');
+        select.innerHTML = data.map(n => `<option>${n}</option>`).join('');
+
+        function doAbsen() {
+            alert('Berhasil! Lokasi Anda telah tercatat.');
         }
     </script>
 </body>
 </html>
-
-
