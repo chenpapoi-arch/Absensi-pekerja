@@ -4,380 +4,872 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - CloudAbsen Pro</title>
+    <title>Sistem Dashboard - CloudAbsen Admin</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
-                }
+    <style>
+        :root {
+            --brand: #4f46e5;
+            --brand-soft: #f5f7ff;
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-400: #94a3b8;
+            --slate-600: #475569;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --amber: #f59e0b;
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --sidebar-w: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--slate-50);
+            color: var(--slate-800);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        aside {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-w);
+            background: white;
+            border-right: 1px solid var(--slate-200);
+            display: flex;
+            flex-direction: column;
+            padding: 2.25rem;
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 0.825rem;
+            margin-bottom: 3.5rem;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--brand);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transform: rotate(3deg);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        .logo-text {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--slate-900);
+        }
+
+        .logo-text span {
+            color: var(--brand);
+        }
+
+        nav {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.325rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            padding: 1.125rem;
+            border-radius: 1.125rem;
+            color: var(--slate-400);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        .nav-item:hover {
+            background: var(--slate-100);
+            color: var(--slate-600);
+        }
+
+        .nav-item.active {
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+        .btn-logout {
+            margin-top: auto;
+            color: var(--rose);
+            font-weight: 800;
+            padding: 1.125rem;
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 1.125rem;
+            transition: .2s;
+        }
+
+        .btn-logout:hover {
+            background: #fff1f2;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.8);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--slate-200);
+            z-index: 900;
+            margin-left: var(--sidebar-w);
+            display: flex;
+            align-items: center;
+            padding: 0 3rem;
+            justify-content: space-between;
+        }
+
+        .page-title {
+            font-size: 1.125rem;
+            font-weight: 800;
+            color: var(--slate-900);
+        }
+
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.625rem;
+            font-weight: 800;
+            color: var(--brand);
+            border: 2px solid var(--brand-soft);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            background: var(--brand-soft);
+        }
+
+        /* Main Content */
+        main {
+            margin-left: var(--sidebar-w);
+            padding: 3rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        /* Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1.5px solid var(--slate-200);
+            border-radius: 2rem;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 1.25rem;
+            background: var(--slate-50);
+            color: var(--brand);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-info .label {
+            font-size: 0.625rem;
+            font-weight: 800;
+            color: var(--slate-400);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-info .value {
+            font-size: 1.875rem;
+            font-weight: 900;
+            color: var(--slate-900);
+        }
+
+        /* Sections / Cards */
+        .section-card {
+            background: white;
+            border: 1.5px solid var(--slate-200);
+            border-radius: 2.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        .section-header {
+            padding: 2rem 2.5rem;
+            border-bottom: 1px solid var(--slate-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h3 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--slate-900);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            padding: 1.25rem 2.5rem;
+            text-align: left;
+            font-size: 0.625rem;
+            font-weight: 900;
+            color: var(--slate-400);
+            text-transform: uppercase;
+            background: var(--slate-50);
+            letter-spacing: 0.1em;
+        }
+
+        td {
+            padding: 1.25rem 2.5rem;
+            border-top: 1px solid var(--slate-100);
+            font-size: 0.8125rem;
+            font-weight: 700;
+            color: var(--slate-600);
+            vertical-align: middle;
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--brand-soft);
+            color: var(--brand);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.375rem 0.875rem;
+            border-radius: 0.75rem;
+            font-size: 0.625rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-brand {
+            background: var(--brand-soft);
+            color: var(--brand);
+            border: 1.5px solid #e0e7ff;
+        }
+
+        .badge-emerald {
+            background: #ecfdf5;
+            color: var(--emerald);
+            border: 1.5px solid #d1fae5;
+        }
+
+        .badge-rose {
+            background: #fff1f2;
+            color: var(--rose);
+            border: 1.5px solid #ffe4e6;
+        }
+
+        .badge-amber {
+            background: #fffbeb;
+            color: var(--amber);
+            border: 1.5px solid #fef3c7;
+        }
+
+        /* Form */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 540px;
+            border-radius: 2.5rem;
+            padding: 3rem;
+            animation: viewIn 0.3s;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .field label {
+            font-size: 0.6875rem;
+            font-weight: 800;
+            color: var(--slate-400);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            background: var(--slate-50);
+            border: 2px solid var(--slate-100);
+            padding: 1rem;
+            border-radius: 1.125rem;
+            width: 100%;
+            font-family: inherit;
+            font-weight: 700;
+            outline: none;
+            transition: .2s;
+        }
+
+        input:focus {
+            border-color: var(--brand);
+            background: white;
+        }
+
+        .btn {
+            padding: 1rem 1.5rem;
+            border-radius: 1.125rem;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: .2s;
+            font-family: inherit;
+            font-size: 0.875rem;
+        }
+
+        .btn-brand {
+            background: var(--brand);
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-brand:hover {
+            background: var(--brand-900);
+            transform: translateY(-2px);
+        }
+
+        .btn-soft {
+            background: var(--slate-100);
+            color: var(--slate-600);
+        }
+
+        /* View State */
+        .view-section {
+            display: none;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        .view-section.active {
+            display: flex;
+            animation: viewIn 0.5s;
+        }
+
+        @keyframes viewIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
-    </script>
 
-    <style>
-        body {
-            background-color: #f8fafc;
-        }
+        @media (max-width: 1024px) {
+            aside {
+                transform: translateX(-100%);
+                width: 0;
+                padding: 0;
+                overflow: hidden;
+            }
 
-        .glass {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
+            .top-bar {
+                left: 0;
+                margin-left: 0;
+            }
 
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #cbd5e1;
+            main {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 
-<body class="min-h-screen bg-slate-50 flex flex-col md:flex-row">
+<body>
 
-    <!-- DESKTOP SIDEBAR -->
-    <aside class="hidden md:flex w-72 h-screen bg-white border-r flex-col p-8 sticky top-0 z-50">
-        <div class="flex items-center gap-3 mb-12">
-            <div
-                class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-xl shadow-indigo-100 transform rotate-3">
-                <i data-lucide="shield-check"></i></div>
-            <h1 class="font-black text-xl text-slate-900 tracking-tight">Cloud<span class="text-indigo-600">Absen</span>
-            </h1>
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="logo-box">
+            <div class="logo-icon"><i data-lucide="shield-check" style="width: 22px;"></i></div>
+            <h1 class="logo-text">Cloud<span>Absen</span></h1>
         </div>
-
-        <nav class="flex-1 space-y-2">
-            <button onclick="switchView('dashboard')" id="side-dashboard"
-                class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl bg-indigo-50 text-indigo-600 font-bold transition-all"><i
+        <nav>
+            <button onclick="switchView('dashboard')" class="nav-item active" id="nav-dashboard"><i
                     data-lucide="layout-grid"></i> Dashboard</button>
-            <button onclick="switchView('employees')" id="side-employees"
-                class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50/50 font-bold transition-all"><i
-                    data-lucide="users"></i> Pegawai</button>
-            <button onclick="switchView('history')" id="side-history"
-                class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50/50 font-bold transition-all"><i
-                    data-lucide="book-open"></i> Riwayat Log</button>
-            <button onclick="switchView('settings')" id="side-settings"
-                class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50/50 font-bold transition-all"><i
-                    data-lucide="settings"></i> Pengaturan</button>
+            <button onclick="switchView('employees')" class="nav-item" id="nav-employees"><i data-lucide="users"></i>
+                Pegawai</button>
+            <button onclick="switchView('leave')" class="nav-item" id="nav-leave"><i data-lucide="calendar-clock"></i>
+                Persetujuan Cuti</button>
+            <button onclick="switchView('payroll')" class="nav-item" id="nav-payroll"><i data-lucide="id-card"></i> Gaji
+                & Payroll</button>
+            <button onclick="switchView('history')" class="nav-item" id="nav-history"><i data-lucide="book-copy"></i>
+                Log Absensi</button>
+            <button onclick="switchView('settings')" class="nav-item" id="nav-settings"><i data-lucide="settings"></i>
+                Sistem</button>
         </nav>
-
-        <div class="pt-8 border-t border-slate-100 flex items-center justify-between">
-            <button onclick="window.location.href='index.html'"
-                class="flex items-center gap-3 text-rose-500 font-bold hover:bg-rose-50 px-4 py-2 rounded-xl transition-all"><i
-                    data-lucide="log-out"></i> Keluar</button>
-        </div>
+        <button onclick="window.location.href='index.html'" class="btn-logout"><i data-lucide="log-out"></i>
+            Logout</button>
     </aside>
 
-    <!-- MOBILE HEADER -->
-    <header class="md:hidden bg-white border-b p-6 flex items-center justify-between sticky top-0 z-50">
-        <h1 class="font-black text-slate-900 tracking-tight">Cloud<span class="text-indigo-600">Absen</span></h1>
-        <button onclick="window.location.href='index.html'" class="p-2 text-rose-500"><i
-                data-lucide="log-out"></i></button>
-    </header>
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <h2 id="top-title" class="page-title">Executive Dashboard</h2>
+        <div class="sync-status"><i data-lucide="zap" style="width: 12px; fill: var(--brand);"></i> CLOUDFLARE D1 SYNC:
+            ONLINE</div>
+    </div>
 
-    <main class="flex-1 p-6 md:p-12 transition-all space-y-10">
+    <main>
 
-        <!-- DASHBOARD VIEW -->
-        <div id="view-dashboard" class="space-y-10 animate-in">
-            <div class="flex items-end justify-between">
-                <div>
-                    <h2 class="text-3xl font-black text-slate-900 tracking-tight uppercase">Admin <span
-                            class="text-indigo-600">Dashboard</span></h2>
-                    <p class="text-slate-400 text-sm font-medium">Ringkasan aktivitas operasional hari ini.</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div
-                    class="bg-white border p-8 rounded-[2rem] shadow-sm flex flex-col justify-between group md:hover:shadow-xl transition-all h-48">
-                    <div
-                        class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                        <i data-lucide="users"></i></div>
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Pegawai
-                        </p>
-                        <h4 id="stat-total" class="text-4xl font-black text-slate-800 tracking-tight">--</h4>
+        <!-- VIEW: DASHBOARD -->
+        <div id="view-dashboard" class="view-section active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i data-lucide="users"></i></div>
+                    <div class="stat-info">
+                        <p class="label">Total Pegawai</p>
+                        <h4 id="stat-total">--</h4>
                     </div>
                 </div>
-                <div
-                    class="bg-white border-2 border-emerald-50 p-8 rounded-[2rem] shadow-sm flex flex-col justify-between group md:hover:shadow-xl md:hover:border-emerald-100 transition-all h-48">
-                    <div
-                        class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                        <i data-lucide="check-circle"></i></div>
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Hadir (Hari Ini)
-                        </p>
-                        <h4 id="stat-present" class="text-4xl font-black text-slate-800 tracking-tight">--</h4>
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: var(--emerald);"><i data-lucide="check-circle-2"></i></div>
+                    <div class="stat-info">
+                        <p class="label">Hadir Hari Ini</p>
+                        <h4 id="stat-present">--</h4>
                     </div>
                 </div>
-                <div
-                    class="bg-white border p-8 rounded-[2rem] shadow-sm flex flex-col justify-between group md:hover:shadow-xl transition-all h-48">
-                    <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600"><i
-                            data-lucide="activity"></i></div>
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Tingkat
-                            Kehadiran</p>
-                        <h4 id="stat-percent" class="text-4xl font-black text-indigo-600 tracking-tight">--%</h4>
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: var(--amber);"><i data-lucide="clock"></i></div>
+                    <div class="stat-info">
+                        <p class="label">Pending Izin</p>
+                        <h4 id="stat-leave">--</h4>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Activity Mini Table -->
-            <div class="bg-white border rounded-[2.5rem] overflow-hidden shadow-sm">
-                <div class="p-6 border-b bg-slate-50/50 flex items-center justify-between">
-                    <h4 class="font-black text-slate-800 text-xs uppercase tracking-widest">Aktivitas Terkini</h4>
-                    <button onclick="fetchRekap()" class="text-indigo-600 text-xs font-bold"><i data-lucide="refresh-cw"
-                            class="w-4 h-4"></i></button>
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>Aktivitas Presensi Terakhir</h3>
+                    <button onclick="fetchLogs()" class="btn btn-soft"
+                        style="padding: 0.5rem 1rem; font-size: 0.75rem;"><i data-lucide="refresh-cw"
+                            style="width: 14px;"></i> Refresh D1</button>
                 </div>
-                <div id="rekap-list" class="divide-y divide-slate-100">
-                    <div class="p-10 text-center text-xs text-slate-400">Menyinkronkan data dari D1...</div>
+                <div class="table-wrap">
+                    <table id="table-logs">
+                        <thead>
+                            <tr>
+                                <th>Pegawai</th>
+                                <th>Waktu</th>
+                                <th>Lokasi</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-body">
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 4rem; opacity: 0.5;">Memuat log D1
+                                    Server...</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- EMPLOYEES VIEW -->
-        <div id="view-employees" class="hidden space-y-10 animate-in">
-            <div>
-                <h2 class="text-3xl font-black text-slate-900 tracking-tight uppercase italic">Kelola <span
-                        class="text-indigo-600">Pegawai</span></h2>
-                <p class="text-slate-400 text-sm font-medium">Tambah atau hapus akses anggota tim.</p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                <div class="lg:col-span-1 bg-indigo-600 p-8 rounded-[2.5rem] shadow-2xl text-white space-y-6">
-                    <h4 class="font-black uppercase tracking-widest text-xs opacity-70">Pendaftaran Baru</h4>
-                    <div class="space-y-4">
-                        <div class="space-y-2"><label
-                                class="text-[9px] font-black uppercase tracking-widest text-white/50 ml-1">Nama
-                                Lengkap</label><input id="reg-name" type="text" placeholder="Budi Santoso"
-                                class="w-full bg-white/10 border border-white/20 p-4 rounded-2xl text-sm font-bold placeholder:text-white/30 focus:bg-white/20 outline-none transition-all">
-                        </div>
-                        <div class="space-y-2"><label
-                                class="text-[9px] font-black uppercase tracking-widest text-white/50 ml-1">Divisi /
-                                Jabatan</label><input id="reg-dept" type="text" placeholder="Operator"
-                                class="w-full bg-white/10 border border-white/20 p-4 rounded-2xl text-sm font-bold placeholder:text-white/30 focus:bg-white/20 outline-none transition-all">
-                        </div>
-                        <button onclick="addEmployee()"
-                            class="w-full bg-white text-indigo-600 font-black py-4 rounded-2xl shadow-xl transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"><i
-                                data-lucide="user-plus"></i> Simpan Data</button>
-                    </div>
+        <!-- VIEW: EMPLOYEES (CRUD) -->
+        <div id="view-employees" class="view-section">
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>Database Pegawai</h3>
+                    <button onclick="openAddModal()" class="btn btn-brand"><i data-lucide="user-plus"></i> Tambah
+                        Pegawai</button>
                 </div>
-
-                <div class="lg:col-span-2 bg-white border rounded-[2.5rem] shadow-sm overflow-hidden">
-                    <div id="employee-list" class="divide-y divide-slate-100">
-                        <!-- Employees will be rendered here -->
-                    </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Pegawai</th>
+                                <th>Departemen</th>
+                                <th>Gaji Pokok</th>
+                                <th>Cuti Tahunan</th>
+                                <th>Jadwal Kerja</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employees-body"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- HISTORY VIEW -->
-        <div id="view-history" class="hidden space-y-10 animate-in">
-            <div class="flex justify-between items-end">
-                <div>
-                    <h2 class="text-3xl font-black text-slate-900 tracking-tight uppercase italic">Rekap <span
-                            class="text-indigo-600">Presensi</span></h2>
-                    <p class="text-slate-400 text-sm font-medium">Log riwayat kehadiran lengkap dari SQL D1 Database.
-                    </p>
+        <!-- VIEW: LEAVE APPROVAL -->
+        <div id="view-leave" class="view-section">
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>Pengajuan & Persetujuan Cuti</h3>
                 </div>
-                <button onclick="exportCSV()"
-                    class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-6 py-3 rounded-2xl font-black text-xs flex items-center gap-2 shadow-sm hover:scale-105 transition-all"><i
-                        data-lucide="download"></i> Excel Report</button>
-            </div>
-            <div class="bg-white border rounded-[2.5rem] overflow-hidden shadow-sm">
-                <div id="full-history-list" class="divide-y divide-slate-100 max-h-[600px] overflow-y-auto">
-                    <!-- History will be rendered here -->
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Pegawai</th>
+                                <th>Alasan</th>
+                                <th>Durasi</th>
+                                <th>Pesan</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leave-body"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- SETTINGS VIEW -->
-        <div id="view-settings" class="hidden space-y-10 animate-in max-w-2xl">
-            <div>
-                <h2 class="text-3xl font-black text-slate-900 tracking-tight uppercase italic">System <span
-                        class="text-indigo-600">Settings</span></h2>
-                <p class="text-slate-400 text-sm font-medium">Konfigurasi operasional dan sinkronisasi server.</p>
-            </div>
-            <div class="bg-white border p-8 rounded-[2.5rem] space-y-8 shadow-sm">
-                <div class="flex items-center justify-between p-6 bg-slate-50 rounded-3xl border">
-                    <div>
-                        <h4 class="font-bold text-slate-800">Sinkronisasi Cloudflare</h4>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Status: Terhubung
-                            Ke SQL D1 ✅</p>
-                    </div>
-                    <div class="w-12 h-6 bg-indigo-600 rounded-full relative p-1 transition-all">
-                        <div class="absolute right-1 w-4 h-4 bg-white rounded-full"></div>
-                    </div>
+        <!-- VIEW: PAYROLL -->
+        <div id="view-payroll" class="view-section">
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>Tinjauan Gaji & Cashbon</h3>
                 </div>
-                <div class="space-y-4">
-                    <h4 class="font-black text-xs uppercase tracking-[0.2em] text-slate-400 ml-2">Advanced Security</h4>
-                    <button onclick="clearLogsOneYear()"
-                        class="w-full flex items-center justify-between p-6 border-2 border-slate-50 hover:border-rose-100 hover:bg-rose-50/20 text-slate-600 hover:text-rose-600 rounded-3xl transition-all active:scale-95 group">
-                        <div class="flex items-center gap-4">
-                            <div
-                                class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-rose-100">
-                                <i data-lucide="trash-2"></i></div>
-                            <div class="text-left">
-                                <p class="font-bold">Hapus Arsip > 1 Tahun</p>
-                                <p class="text-[10px] opacity-70">Pembersihan database SQL secara berkala</p>
-                            </div>
-                        </div>
-                        <i data-lucide="chevron-right"></i>
-                    </button>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Pegawai</th>
+                                <th>Gaji Pokok</th>
+                                <th>Uang Makan</th>
+                                <th>Cashbon</th>
+                                <th>Total Estimasi</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payroll-body"></tbody>
+                    </table>
                 </div>
             </div>
+        </div>
 
-            <!-- CORS FIX GUIDE -->
-            <div class="bg-indigo-50 border border-indigo-100 p-8 rounded-[2.5rem] space-y-4">
-                <h4 class="font-black text-sm uppercase text-indigo-700 underline">💡 Solusi CORS & Error 500</h4>
-                <p class="text-xs text-indigo-600 leading-relaxed font-medium">Jika Anda melihat error **CORS** atau
-                    **500**, pastikan script Worker Cloudflare Anda memiliki header **'Access-Control-Allow-Origin':
-                    '*'** dan menangani request **OPTIONS**. Hubungi pakar IT atau update script worker D1 Anda.</p>
+        <!-- VIEW: HISTORY -->
+        <div id="view-history" class="view-section">
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>Arsip Log Keseluruhan</h3>
+                    <button onclick="exportCSV()" class="btn btn-soft"><i data-lucide="download"></i> Download
+                        CSV</button>
+                </div>
+                <div class="table-wrap">
+                    <table id="table-archive-logs">
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Waktu</th>
+                                <th>Lokasi</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="archive-logs-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: SETTINGS -->
+        <div id="view-settings" class="view-section">
+            <div class="section-card"
+                style="max-width: 600px; padding: 3rem; display: flex; flex-direction: column; gap: 2rem;">
+                <div style="border-bottom: 2px solid var(--slate-100); padding-bottom: 1.5rem;">
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.25rem;">Pemeliharaan Sistem</h3>
+                    <p style="font-size: 0.875rem; color: var(--slate-400);">Konfigurasi database D1 dan pembersihan log
+                        periodik.</p>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="font-size: 0.9375rem; font-weight: 800;">Purge Log D1 (Arsip)</h4>
+                            <p style="font-size: 0.75rem; color: var(--slate-400);">Hapus data yang berumur lebih dari 1
+                                tahun</p>
+                        </div>
+                        <button onclick="purgeLogs()" class="btn btn-soft" style="color: var(--rose);">Jalankan
+                            Purge</button>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- MOBILE TABS -->
-    <nav
-        class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] glass rounded-full p-2 flex justify-between items-center z-50">
-        <button onclick="switchView('dashboard')" class="p-4 rounded-full text-indigo-600 bg-indigo-50"><i
-                data-lucide="layout-grid"></i></button>
-        <button onclick="switchView('employees')" class="p-4 rounded-full text-slate-400"><i
-                data-lucide="users"></i></button>
-        <button onclick="switchView('history')" class="p-4 rounded-full text-slate-400"><i
-                data-lucide="book-open"></i></button>
-        <button onclick="switchView('settings')" class="p-4 rounded-full text-slate-400"><i
-                data-lucide="settings"></i></button>
-    </nav>
+    <!-- MODAL: ADD EMPLOYEE -->
+    <div id="modal-employee" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 2rem;">Daftarkan Pegawai Baru</h3>
+            <div class="form-grid">
+                <div class="field"><label>Nama Lengkap</label><input type="text" id="add-name"
+                        placeholder="Budi Santoso"></div>
+                <div class="field"><label>Divisi</label><select id="add-dept">
+                        <option>Teknisi</option>
+                        <option>IT</option>
+                        <option>Admin</option>
+                        <option>Satpam</option>
+                        <option>Logistik</option>
+                    </select></div>
+                <div class="field"><label>Gaji Pokok (IDR)</label><input type="number" id="add-salary" value="5000000">
+                </div>
+                <div class="field"><label>Uang Makan</label><input type="number" id="add-food" value="50000"></div>
+                <div class="field"><label>Jadwal Kerja (Shift)</label><select id="add-schedule">
+                        <option>08:00 - 17:00</option>
+                        <option>07:00 - 16:00 (Pagi)</option>
+                        <option>16:00 - 01:00 (Malam)</option>
+                        <option>24 Jam Rolling</option>
+                    </select></div>
+                <div class="field"><label>Jatah Cuti Per-Tahun</label><input type="number" id="add-leave" value="12">
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 3rem;">
+                <button onclick="saveEmployee()" class="btn btn-brand" style="flex: 1;">Simpan Ke D1 SQL</button>
+                <button onclick="document.getElementById('modal-employee').classList.remove('active')"
+                    class="btn btn-soft" style="flex: 1;">Batalkan</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        lucide.createIcons();
-        const API_URL = 'https://absensi.chenpapoi.workers.dev/';
+        const API_URL = 'https://absensi.chenpapoi.workers.dev/api';
+        let cachedData = { users: [], logs: [], leave: [] };
 
-        // --- Logic ---
-        function switchView(view) {
-            document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
-            document.getElementById('view-' + view).classList.remove('hidden');
-
-            // Sidebar active
-            document.querySelectorAll('aside nav button').forEach(b => {
-                b.className = 'w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50/50 font-bold transition-all';
-            });
-            const activeBtn = document.getElementById('side-' + view);
-            if (activeBtn) activeBtn.className = 'w-full flex items-center gap-4 px-4 py-4 rounded-2xl bg-indigo-50 text-indigo-600 font-bold transition-all';
-
-            if (view === 'employees') renderEmployees();
-            if (view === 'dashboard' || view === 'history') fetchRekap();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        async function init() {
+            if (localStorage.getItem('role') !== 'admin') window.location.href = 'index.html';
+            lucide.createIcons();
+            fetchData();
         }
 
-        function renderEmployees() {
-            const data = JSON.parse(localStorage.getItem('pekerja')) || [];
-            const list = document.getElementById('employee-list');
-            list.innerHTML = data.length ? data.map((n, i) => `
-                <div class="p-6 flex items-center justify-between hover:bg-slate-50 transition-all">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-xs font-black text-indigo-600">${n[0]}</div>
-                        <div><p class="text-xs font-bold text-slate-800">${n}</p><p class="text-[10px] text-slate-400 italic">Member Staf</p></div>
-                    </div>
-                    <button onclick="delEmployee(${i})" class="text-slate-300 hover:text-rose-500 transition-all"><i data-lucide="x-circle" class="w-5 h-5"></i></button>
-                </div>
-            `).join('') : '<p class="p-10 text-center text-xs text-slate-400 font-bold">Belum ada pegawai yang terdaftar.</p>';
+        async function fetchData() {
+            try {
+                const [uRes, lRes, lvRes] = await Promise.all([
+                    fetch(`${API_URL}/users`),
+                    fetch(`${API_URL}/absensi`),
+                    fetch(`${API_URL}/leave`)
+                ]);
+                cachedData.users = await uRes.json();
+                cachedData.logs = await lRes.json();
+                cachedData.leave = await lvRes.json();
+
+                renderDashboard();
+                renderEmployees();
+                renderLeave();
+                renderPayroll();
+                renderHistory();
+            } catch (e) { console.error("API 500: Database Error", e); }
+        }
+
+        function renderDashboard() {
+            const pegs = cachedData.users.filter(u => u.role === 'pegawai');
+            document.getElementById('stat-total').innerText = pegs.length;
+            document.getElementById('stat-present').innerText = cachedData.logs.length; // Simplified
+            document.getElementById('stat-leave').innerText = cachedData.leave.filter(l => l.status === 'Pending').length;
+
+            const logsBody = document.getElementById('logs-body');
+            logsBody.innerHTML = cachedData.logs.slice(0, 10).map(l => `
+                <tr>
+                    <td><div class="user-cell"><div class="avatar">${l.nama[0]}</div><span>${l.nama}</span></div></td>
+                    <td>${new Date(l.waktu).toLocaleString('id-ID')}</td>
+                    <td>${l.lokasi}</td>
+                    <td><span class="badge ${l.status === 'Verified' ? 'badge-emerald' : 'badge-brand'}">${l.status}</span></td>
+                </tr>
+            `).join('');
             lucide.createIcons();
         }
 
-        function addEmployee() {
-            const name = document.getElementById('reg-name').value;
-            const det = document.getElementById('reg-dept').value;
-            if (!name) return alert('Nama wajib diisi!');
-            const emps = JSON.parse(localStorage.getItem('pekerja')) || [];
-            emps.push(`${name} (${det || 'No Dept'})`);
-            localStorage.setItem('pekerja', JSON.stringify(emps));
-            alert('Pegawai Berhasil Ditambahkan!');
-            document.getElementById('reg-name').value = '';
-            document.getElementById('reg-dept').value = '';
-            renderEmployees();
-            refreshDashboardStats();
+        function renderEmployees() {
+            const body = document.getElementById('employees-body');
+            const emps = cachedData.users.filter(u => u.role === 'pegawai');
+            body.innerHTML = emps.map(u => `
+                <tr>
+                    <td><div class="user-cell"><div class="avatar">${u.nama[0]}</div><span>${u.nama}</span></div></td>
+                    <td><span class="badge badge-brand">${u.dept}</span></td>
+                    <td>Rp ${u.base_salary.toLocaleString()}</td>
+                    <td>${u.leave_used}/${u.leave_total} Hari</td>
+                    <td>${u.schedule}</td>
+                    <td><button class="nav-item" style="color:var(--rose); padding: 0;"><i data-lucide="trash-2" style="width: 14px;"></i></button></td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
         }
 
-        function delEmployee(idx) {
-            if (confirm('Hapus data pegawai ini?')) {
-                const emps = JSON.parse(localStorage.getItem('pekerja'));
-                emps.splice(idx, 1);
-                localStorage.setItem('pekerja', JSON.stringify(emps));
-                renderEmployees();
-                refreshDashboardStats();
-            }
+        function renderLeave() {
+            const body = document.getElementById('leave-body');
+            body.innerHTML = cachedData.leave.map(l => `
+                <tr>
+                    <td>${l.nama}</td>
+                    <td><span class="badge badge-amber">${l.type}</span></td>
+                    <td>${l.start_date} s/d ${l.end_date}</td>
+                    <td style="font-size: 0.7rem; font-style: italic;">"${l.reason}"</td>
+                    <td><span class="badge ${l.status === 'Pending' ? 'badge-amber' : l.status === 'Approved' ? 'badge-emerald' : 'badge-rose'}">${l.status}</span></td>
+                    <td style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-brand" style="padding: 0.5rem;"><i data-lucide="check" style="width: 14px;"></i></button>
+                        <button class="btn btn-soft" style="padding: 0.5rem; color: var(--rose);"><i data-lucide="x" style="width: 14px;"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
         }
 
-        async function fetchRekap() {
-            const miniList = document.getElementById('rekap-list');
-            const fullList = document.getElementById('full-history-list');
+        function renderPayroll() {
+            const body = document.getElementById('payroll-body');
+            const emps = cachedData.users.filter(u => u.role === 'pegawai');
+            body.innerHTML = emps.map(u => `
+                <tr>
+                    <td>${u.nama}</td>
+                    <td>Rp ${u.base_salary.toLocaleString()}</td>
+                    <td>Rp ${u.food_allowance.toLocaleString()}</td>
+                    <td><span style="color: var(--rose);">- Rp ${u.cash_advance.toLocaleString()}</span></td>
+                    <td style="font-weight: 900; color: var(--brand);">Rp ${(u.base_salary + u.food_allowance - u.cash_advance).toLocaleString()}</td>
+                    <td><span class="badge badge-rose">Unpaid</span></td>
+                </tr>
+            `).join('');
+        }
 
+        function renderHistory() {
+            const body = document.getElementById('archive-logs-body');
+            body.innerHTML = cachedData.logs.map(l => `<tr><td>${l.nama}</td><td>${l.waktu}</td><td>${l.lokasi}</td><td>${l.status}</td></tr>`).join('');
+        }
+
+        // --- View Switching ---
+        function switchView(v) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${v}`).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${v}`).classList.add('active');
+            document.getElementById('top-title').innerText = v.charAt(0).toUpperCase() + v.slice(1);
+        }
+
+        // --- Actions ---
+        function openAddModal() { document.getElementById('modal-employee').classList.add('active'); }
+        async function saveEmployee() {
+            const payload = {
+                nama: document.getElementById('add-name').value,
+                dept: document.getElementById('add-dept').value,
+                role: 'pegawai',
+                salary: parseInt(document.getElementById('add-salary').value),
+                food: parseInt(document.getElementById('add-food').value),
+                leave: parseInt(document.getElementById('add-leave').value)
+            };
             try {
-                const res = await fetch(API_URL);
-                const data = await res.json();
-                const totalHadir = data.length;
-
-                const html = data.length ? data.map(r => `
-                    <div class="p-6 flex items-center justify-between group hover:bg-indigo-50/20 transition-all">
-                        <div class="flex items-center gap-4">
-                            <div class="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[10px] font-black text-indigo-600">${r.nama[0]}</div>
-                            <div><p class="text-[11px] font-bold text-slate-800 group-hover:text-indigo-600 transition-all">${r.nama}</p><p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">${new Date(r.waktu).toLocaleString('id-ID')}</p></div>
-                        </div>
-                        <div class="text-right">
-                             <div class="text-[9px] font-black text-emerald-500 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100 uppercase tracking-widest">Verified</div>
-                             <p class="text-[8px] text-slate-300 font-mono mt-1">${r.lokasi}</p>
-                        </div>
-                    </div>
-                `).join('') : '<p class="p-20 text-center text-xs text-slate-400 font-bold italic uppercase tracking-widest">Database D1 Kosong</p>';
-
-                if (miniList) miniList.innerHTML = html;
-                if (fullList) fullList.innerHTML = html;
-
-                refreshDashboardStats(data.length);
-            } catch (e) {
-                const err = '<p class="p-20 text-center text-[10px] text-rose-500 font-black uppercase tracking-widest leading-loose">API ERROR: CORS Gagal / Cloudflare 500<br>Lihat Panduan di Menu Pengaturan</p>';
-                if (miniList) miniList.innerHTML = err;
-                if (fullList) fullList.innerHTML = err;
-            }
+                const res = await fetch(`${API_URL}/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) { alert('Pegawai ditambahkan ke D1 Database.'); location.reload(); }
+            } catch (e) { alert('Gagal simpan data.'); }
         }
 
-        function refreshDashboardStats(hadirCount = 0) {
-            const totalEmps = (JSON.parse(localStorage.getItem('pekerja')) || []).length;
-            document.getElementById('stat-total').innerText = totalEmps;
-            document.getElementById('stat-present').innerText = hadirCount;
-            document.getElementById('stat-percent').innerText = totalEmps ? Math.round((hadirCount / totalEmps) * 100) : 0;
-        }
+        async function purgeLogs() { if (confirm('Hapus log > 1 tahun?')) { await fetch(`${API_URL}/purge`, { method: 'POST' }); alert('Purge Sukses'); fetchData(); } }
+        function exportCSV() { alert('E-Report CSV Sedang Diproses...'); }
+        function fetchLogs() { fetchData(); }
 
-        function clearLogsOneYear() { if (confirm('Hapus log > 1 tahun?')) alert('Fitur SQL Purge diaktifkan.'); }
-        function exportCSV() { alert('Laporan sedang diproses di server...'); }
-
-        // Initial Load
-        switchView('dashboard');
-        refreshDashboardStats();
+        init();
     </script>
-
 </body>
 
 </html>
