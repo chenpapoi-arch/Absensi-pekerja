@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karyawan - CloudAbsen Pro</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f8fafc;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .scanner-frame {
+            position: relative;
+            border: 8px solid white;
+            border-radius: 2rem;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #6366f1, transparent);
+            box-shadow: 0 0 20px #6366f1;
+            animation: scan-v 3s linear infinite;
+            display: none;
+            z-index: 20;
+        }
+
+        @keyframes scan-v {
+            0% {
+                top: 10%;
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                top: 90%;
+                opacity: 0;
+            }
+        }
+
+        #map-v2 {
+            height: 260px;
+            border-radius: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-slate-50 flex flex-col md:items-center p-6 pb-24">
+
+    <header class="w-full max-w-4xl flex items-center justify-between mb-8">
+        <div class="flex items-center gap-3">
+            <button onclick="window.location.href='index.html'"
+                class="w-10 h-10 rounded-xl bg-white border flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-all"><i
+                    data-lucide="arrow-left" class="w-5 h-5"></i></button>
+            <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">Portal <span
+                    class="text-indigo-600 text-2xl uppercase italic">Karyawan</span></h1>
+        </div>
+        <div class="flex items-center gap-4 bg-white px-4 py-2 rounded-2xl border shadow-sm">
+            <div
+                class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold overflow-hidden">
+                <img src="https://ui-avatars.com/api/?name=Staf&background=e0e7ff&color=4f46e5&bold=true" />
+            </div>
+            <div>
+                <p id="staf-name" class="text-xs font-bold text-slate-800">Sopian (Field)</p>
+                <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest">Active Member</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-lg grid grid-cols-1 gap-8 animate-in">
+        <!-- 1. IDENTITAS -->
+        <div class="space-y-3">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pilih Identitas
+                Pegawai</label>
+            <select id="user-select"
+                class="w-full bg-white border border-slate-200 p-5 rounded-3xl font-bold text-slate-800 focus:ring-4 focus:ring-indigo-100 outline-none appearance-none transition-all shadow-sm"></select>
+        </div>
+
+        <!-- 2. PEMINDAIAN WAJAH -->
+        <div class="scanner-frame aspect-square bg-slate-900 flex items-center justify-center relative group">
+            <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=800&auto=format&fit=crop"
+                class="w-full h-full object-cover grayscale opacity-30 group-hover:scale-110 transition-transform duration-[5s]" />
+            <div class="absolute inset-0 bg-slate-900/60 transition-opacity duration-700 group-hover:opacity-40"></div>
+            <div id="v2-scanner-line" class="scanner-line"></div>
+
+            <div id="v2-scan-idle" class="absolute inset-0 z-30 flex items-center justify-center">
+                <button onclick="startScanning()"
+                    class="bg-indigo-600 text-white w-20 h-20 rounded-full flex flex-col items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all text-xs font-black uppercase tracking-widest gap-1 border-4 border-white/20">
+                    <i data-lucide="camera" class="w-7 h-7"></i> Start
+                </button>
+            </div>
+
+            <div id="v2-scan-complete"
+                class="absolute inset-0 z-50 bg-emerald-600 flex flex-col items-center justify-center scale-0 transition-transform duration-500">
+                <div class="bg-white rounded-full p-4 mb-3"><i data-lucide="check"
+                        class="w-12 h-12 text-emerald-600"></i></div>
+                <h3 class="text-2xl font-black text-white uppercase italic tracking-widest">VERIFIED</h3>
+            </div>
+        </div>
+
+        <!-- 3. GEOLOKASI -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between px-2">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><i
+                        data-lucide="navigation" class="w-3 h-3 text-indigo-600"></i> Geolokasi Presensi</p>
+                <span id="v2-location-status"
+                    class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100 uppercase tracking-widest">Memperoleh
+                    GPS...</span>
+            </div>
+            <div id="map-v2" class="shadow-xl"></div>
+        </div>
+
+        <button id="v2-btn-submit" onclick="submitAttendance()" disabled
+            class="w-full bg-slate-900 text-white py-6 rounded-3xl font-black flex items-center justify-center gap-3 shadow-2xl shadow-indigo-200 transition-all opacity-50 active:scale-95">
+            SUBMIT KEHADIRAN <i data-lucide="send" class="w-5 h-5"></i>
+        </button>
+    </main>
+
+    <nav
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[400px] glass rounded-full p-3 flex justify-evenly items-center shadow-2xl z-50">
+        <button class="p-4 rounded-full text-indigo-600 bg-indigo-50"><i data-lucide="layout-grid"></i></button>
+        <button class="p-4 rounded-full text-slate-400"><i data-lucide="scan"></i></button>
+        <div onclick="startScanning()"
+            class="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center text-white shadow-xl shadow-indigo-200 cursor-pointer -mt-10 border-4 border-slate-50">
+            <i data-lucide="fingerprint"></i></div>
+        <button class="p-4 rounded-full text-slate-400"><i data-lucide="history"></i></button>
+        <button class="p-4 rounded-full text-slate-400"><i data-lucide="user"></i></button>
+    </nav>
+
+    <script>
+        lucide.createIcons();
+        const API_URL = 'https://absensi.chenpapoi.workers.dev/';
+        let mapV2, userLocationV2 = null;
+
+        const employees = JSON.parse(localStorage.getItem('pekerja')) || ['Dedi (Operator)', 'Sopian (Field)'];
+        const select = document.getElementById('user-select');
+        select.innerHTML = employees.map(n => `<option value="${n}">${n}</option>`).join('');
+
+        function initMap() {
+            if (mapV2) return;
+            mapV2 = L.map('map-v2', { zoomControl: false }).setView([-6.2088, 106.8456], 15);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(mapV2);
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    userLocationV2 = `${pos.coords.latitude.toFixed(6)},${pos.coords.longitude.toFixed(6)}`;
+                    const markerIcon = L.divIcon({ className: 'm', html: '<div class="w-5 h-5 bg-indigo-600 rounded-full border-4 border-white shadow-xl animate-pulse"></div>' });
+                    L.marker([pos.coords.latitude, pos.coords.longitude], { icon: markerIcon }).addTo(mapV2);
+                    mapV2.setView([pos.coords.latitude, pos.coords.longitude], 16);
+                    document.getElementById('v2-location-status').innerText = 'LOKASI TERKONFIRMASI ✅';
+                    document.getElementById('v2-location-status').className = 'text-[10px] font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 uppercase tracking-widest';
+                });
+            }
+        }
+
+        function startScanning() {
+            document.getElementById('v2-scan-idle').classList.add('hidden');
+            document.getElementById('v2-scanner-line').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('v2-scanner-line').style.display = 'none';
+                document.getElementById('v2-scan-complete').classList.replace('scale-0', 'scale-100');
+                const btn = document.getElementById('v2-btn-submit');
+                btn.disabled = false;
+                btn.className = 'w-full bg-indigo-600 text-white py-6 rounded-3xl font-black flex items-center justify-center gap-3 shadow-2xl shadow-indigo-100 transition-all active:scale-95';
+            }, 3000);
+        }
+
+        async function submitAttendance() {
+            const nama = document.getElementById('user-select').value;
+            const btn = document.getElementById('v2-btn-submit');
+
+            btn.innerHTML = '<i class="w-5 h-5 animate-spin"></i> GENERATING D1 RECORD...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nama: nama, lokasi: userLocationV2 || "GPS_ERROR" })
+                });
+
+                if (response.ok) {
+                    alert('Presensi Berhasil Dikirim!');
+                    location.reload();
+                } else {
+                    const err = await response.text();
+                    alert('Server Error (Status ' + response.status + '): ' + err);
+                    btn.disabled = false;
+                    btn.innerHTML = 'SUBMIT KEHADIRAN <i data-lucide="send" class="w-5 h-5"></i>';
+                }
+            } catch (e) {
+                alert('Connection Failed! Pastikan Worker Cloudflare mendukung CORS.');
+                console.error(e);
+                btn.disabled = false;
+                btn.innerHTML = 'SUBMIT KEHADIRAN <i data-lucide="send" class="w-5 h-5"></i>';
+            }
+        }
+
+        setTimeout(initMap, 500);
+    </script>
+</body>
+
+</html>
