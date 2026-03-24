@@ -209,7 +209,7 @@
 
         .btn {
             width: 100%;
-            padding: 1.5rem;
+            padding: 1.125rem;
             border-radius: 1.5rem;
             font-weight: 800;
             border: none;
@@ -230,6 +230,12 @@
             background: var(--slate-200);
             color: var(--slate-400);
             cursor: not-allowed;
+        }
+
+        .btn-logout {
+            background: #fff1f2;
+            color: #ef4444;
+            margin-top: 1rem;
         }
 
         .btn:active {
@@ -368,7 +374,7 @@
     <div class="app-container">
         <header>
             <div class="logo-text">Sistem <span>Absen Online</span></div>
-            <div id="sync-pill" class="badge badge-brand">Sync Ready ✅</div>
+            <div id="sync-pill" class="badge badge-brand">Sistem Aktif ✅</div>
         </header>
 
         <div id="view-scan" class="view active">
@@ -378,7 +384,7 @@
                     <i data-lucide="user-check" style="width: 14px;"></i>
                 </div>
                 <select id="user-select">
-                    <option disabled selected>Memuat data pegawai API...</option>
+                    <option disabled selected>Memuat data pegawai...</option>
                 </select>
             </div>
 
@@ -400,7 +406,7 @@
             </div>
 
             <div class="card">
-                <div class="card-header"><span>Lokasi GPS</span></div>
+                <div class="card-header"><span>Lokasi Saya</span></div>
                 <div id="map-box"></div>
             </div>
 
@@ -411,31 +417,23 @@
 
         <div id="view-info" class="view">
             <div class="card">
-                <div class="card-header"><span>Jadwal Kerja Pekan Ini</span></div>
+                <div class="card-header"><span>Jadwal & Gaji</span></div>
                 <div id="schedule-list">
-                    <div class="salary-row"><span>Status Shift</span><span class="badge badge-emerald">Aktif</span>
-                    </div>
-                    <div class="salary-row"><span>Jam Operasional</span><span id="sch-string">08:00 - 17:00</span></div>
+                    <div class="salary-row"><span>Status</span><span class="badge badge-emerald">Aktif</span></div>
+                    <div class="salary-row"><span>Jam Kerja</span><span id="sch-string">08:00 - 17:00</span></div>
+                    <div class="salary-row"><span>Total Gaji</span><span id="salary-total"
+                            style="color: var(--brand); font-weight: 900;">Rp --</span></div>
                 </div>
             </div>
-
-            <div class="card">
-                <div class="card-header"><span>Estimasi Gaji & Cashbon</span></div>
-                <div class="salary-row"><span>Gaji Pokok</span><span id="salary-basic">Rp --</span></div>
-                <div class="salary-row"><span>Uang Makan</span><span id="salary-food">Rp --</span></div>
-                <div class="salary-row" style="border: none; padding-top: 1.5rem;">
-                    <span style="color: var(--slate-900); font-size: 1rem; font-weight: 800;">Total Gaji</span>
-                    <span id="salary-total" style="color: var(--brand); font-size: 1.125rem; font-weight: 900;">Rp
-                        --</span>
-                </div>
-            </div>
+            <button onclick="window.close()" class="btn btn-logout">Tutup / Keluar Aplikasi <i
+                    data-lucide="log-out"></i></button>
         </div>
 
         <div id="view-leave" class="view">
             <div class="card">
                 <div class="card-header"><span>Status Cuti Tahunan</span></div>
                 <h4 id="leave-available" style="font-size: 2rem; font-weight: 900;">--/12</h4>
-                <p style="font-size: 0.75rem; color: var(--slate-400);">Sisa Hari Cuti</p>
+                <p style="font-size: 0.75rem; color: var(--slate-400);">Sisa Hari Cuti Anda</p>
             </div>
 
             <div class="card">
@@ -446,14 +444,12 @@
                         <option value="" disabled selected>Pilih Alasan Izin</option>
                         <option value="Sakit">Sakit</option>
                         <option value="Cuti">Cuti Tahunan</option>
-                        <option value="Mendadak">Urusan Mendadak</option>
                     </select>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <input type="date" id="leave-start" required>
                         <input type="date" id="leave-end" required>
                     </div>
-                    <textarea id="leave-reason" placeholder="Keterangan singkat..."
-                        style="min-height: 80px;"></textarea>
+                    <textarea id="leave-reason" placeholder="Keterangan..." style="min-height: 80px;"></textarea>
                     <button type="submit" class="btn btn-primary">Kirim Pengajuan</button>
                 </form>
             </div>
@@ -491,7 +487,7 @@
                 const emps = data.filter(u => u.role === 'pegawai');
                 sel.innerHTML = emps.map(u => `<option value="${u.id}" data-all='${JSON.stringify(u)}'>${u.nama} (${u.dept})</option>`).join('');
                 updateUserInfo();
-            } catch (e) { sel.innerHTML = '<option disabled>Koneksi D1 Offline</option>'; }
+            } catch (e) { sel.innerHTML = '<option disabled>Koneksi Gagal</option>'; }
         }
 
         document.getElementById('user-select').addEventListener('change', updateUserInfo);
@@ -501,8 +497,6 @@
             if (!opt) return;
             const u = JSON.parse(opt.getAttribute('data-all'));
             currentUserData = u;
-            document.getElementById('salary-basic').innerText = `Rp ${u.base_salary.toLocaleString()}`;
-            document.getElementById('salary-food').innerText = `Rp ${u.food_allowance.toLocaleString()}`;
             document.getElementById('salary-total').innerText = `Rp ${(u.base_salary + u.food_allowance).toLocaleString()}`;
             document.getElementById('leave-available').innerText = `${u.leave_total - u.leave_used}/${u.leave_total}`;
             document.getElementById('sch-string').innerText = u.schedule || '08:00 - 17:00';
@@ -517,7 +511,7 @@
                     const marker = L.divIcon({ className: 'm', html: '<div style="width:14px; height:14px; background:var(--brand); border:3px solid white; border-radius:50%; box-shadow:0 0 10px rgba(0,0,0,0.2);"></div>' });
                     L.marker([pos.coords.latitude, pos.coords.longitude], { icon: marker }).addTo(mapV2);
                     mapV2.setView([pos.coords.latitude, pos.coords.longitude], 17);
-                }, () => console.log("GPS Locked Out"));
+                }, () => console.log("GPS Off"));
             }
         }
 
@@ -526,7 +520,7 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                 video.srcObject = stream;
-            } catch (e) { console.log("Cam Blocked"); }
+            } catch (e) { console.log("Cam Off"); }
         }
 
         function startScan() {
@@ -547,11 +541,11 @@
             if (!currentUserData) return;
             const btn = document.getElementById('btn-submit');
             btn.innerHTML = 'MENGIRIM...';
-            const payload = { user_id: currentUserData.id, nama: currentUserData.nama, type: 'IN', lokasi: userPos || 'Bypass', status: 'Verified' };
+            const payload = { user_id: currentUserData.id, nama: currentUserData.nama, type: 'IN', lokasi: userPos || 'Office', status: 'Verified' };
             try {
                 const res = await fetch(`${API_URL}/absensi`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 if (res.ok) { alert('Berhasil!'); location.reload(); }
-            } catch (e) { alert('Api Error'); }
+            } catch (e) { alert('Error'); }
         }
 
         function switchView(v) {
