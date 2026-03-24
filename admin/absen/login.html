@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - System Absen Online</title>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --brand: #4f46e5;
+            --brand-soft: #f5f7ff;
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-400: #94a3b8;
+            --slate-600: #475569;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --sidebar-w: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--slate-50);
+            color: var(--slate-800);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Login Screen */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--slate-50);
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .login-card {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            padding: 3rem;
+            border-radius: 2.5rem;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 1px solid var(--slate-200);
+        }
+
+        .login-card h2 {
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-card p {
+            font-size: 0.8125rem;
+            color: var(--slate-400);
+            margin-bottom: 2rem;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 1.25rem;
+            border-radius: 1.25rem;
+            border: 2px solid var(--slate-100);
+            text-align: center;
+            font-weight: 800;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            transition: .2s;
+        }
+
+        input:focus {
+            border-color: var(--brand);
+            outline: none;
+            background: white;
+        }
+
+        /* Sidebar */
+        aside {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-w);
+            background: white;
+            border-right: 1px solid var(--slate-200);
+            display: flex;
+            flex-direction: column;
+            padding: 2.25rem;
+            z-index: 1000;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 0.825rem;
+            margin-bottom: 3.5rem;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--brand);
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transform: rotate(3deg);
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--slate-900);
+        }
+
+        .logo-text span {
+            color: var(--brand);
+        }
+
+        nav {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            padding: 1.1rem;
+            border-radius: 1.1rem;
+            color: var(--slate-400);
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        .nav-item:hover {
+            background: var(--slate-100);
+        }
+
+        .nav-item.active {
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+        /* Main */
+        main {
+            margin-left: var(--sidebar-w);
+            padding: 3rem;
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            position: sticky;
+            top: 0;
+            margin-left: var(--sidebar-w);
+            height: 80px;
+            background: rgba(255, 255, 255, 0.85);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--slate-200);
+            z-index: 900;
+            display: flex;
+            align-items: center;
+            padding: 0 3rem;
+            justify-content: space-between;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1.5px solid var(--slate-200);
+            border-radius: 2rem;
+            padding: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--slate-50);
+            color: var(--brand);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .table-card {
+            background: white;
+            border: 1.5px solid var(--slate-200);
+            border-radius: 2rem;
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--slate-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafbfc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 1rem 2rem;
+            text-align: left;
+            font-size: 0.625rem;
+            font-weight: 900;
+            color: var(--slate-400);
+            background: var(--slate-50);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        td {
+            padding: 1rem 2rem;
+            border-top: 1px solid var(--slate-100);
+            font-size: 0.8125rem;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: .2s;
+        }
+
+        .btn-brand {
+            background: var(--brand);
+            color: white;
+        }
+
+        .btn-soft {
+            background: var(--slate-100);
+            color: var(--slate-600);
+        }
+
+        .view-section {
+            display: none;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .view-section.active {
+            display: flex;
+            animation: viewIn 0.4s;
+        }
+
+        @keyframes viewIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LOGIN OVERLAY -->
+    <div id="login-overlay" class="login-overlay">
+        <div class="login-card">
+            <div class="logo-icon" style="margin: 0 auto 1.5rem; width: 64px; height: 64px;"><i data-lucide="lock"
+                    style="width: 30px;"></i></div>
+            <h2>Admin Login</h2>
+            <p>Sistem Absen Online - Portal Kendali</p>
+            <input type="password" id="login-pass" placeholder="Password Admin">
+            <button onclick="checkAdmin()" class="btn btn-brand" style="width: 100%;">Masuk Sekarang</button>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="hidden">
+        <div class="logo-box">
+            <div class="logo-icon"><i data-lucide="shield-check" style="width: 20px;"></i></div>
+            <h1 class="logo-text">System<span>Absen</span></h1>
+        </div>
+        <nav>
+            <button onclick="switchView('dashboard')" class="nav-item active" id="nav-dashboard"><i
+                    data-lucide="layout-grid"></i> Dashboard</button>
+            <button onclick="switchView('employees')" class="nav-item" id="nav-employees"><i data-lucide="users"></i>
+                Pegawai</button>
+            <button onclick="switchView('history')" class="nav-item" id="nav-history"><i data-lucide="book-copy"></i>
+                Log Absensi</button>
+            <button onclick="location.href='/index.html'" class="btn-soft"
+                style="margin-top: auto; border-radius: 1rem; padding: 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--rose);"><i
+                    data-lucide="log-out"></i> Logout</button>
+        </nav>
+    </aside>
+
+    <div id="main-ui" class="hidden">
+        <div class="top-bar">
+            <h2 id="top-title" style="font-size: 1.125rem; font-weight: 800;">Executive Overview</h2>
+            <div
+                style="font-size: 0.625rem; font-weight: 800; color: var(--brand); padding: 0.5rem 1rem; background: var(--brand-soft); border-radius: 1rem;">
+                D1 SYNC: ONLINE</div>
+        </div>
+
+        <main>
+            <div id="view-dashboard" class="view-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i data-lucide="users"></i></div>
+                        <div>
+                            <p
+                                style="font-size: 10px; font-weight: 800; color: var(--slate-400); text-transform: uppercase;">
+                                Total Staf</p>
+                            <h4 id="stat-total">--</h4>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color: var(--emerald);"><i data-lucide="check-circle"></i></div>
+                        <div>
+                            <p
+                                style="font-size: 10px; font-weight: 800; color: var(--slate-400); text-transform: uppercase;">
+                                Absensi Hari Ini</p>
+                            <h4 id="stat-present">--</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3>Riwayat Terkini (Live D1)</h3><button onclick="fetchData()" class="btn btn-soft"
+                            style="padding: 0.4rem 0.8rem; font-size: 11px;">Refresh</button>
+                    </div>
+                    <table id="table-logs">
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Waktu</th>
+                                <th>Lokasi</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-employees" class="view-section">
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3>Database Pegawai</h3>
+                    </div>
+                    <table id="table-emps">
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Divisi</th>
+                                <th>Gaji Pokok</th>
+                                <th>Jadwal</th>
+                                <th>Hapus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="emps-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-history" class="view-section">
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3>Archive Logs</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Tanggal & Waktu</th>
+                                <th>Detail Lokasi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="archive-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'https://absensi.chenpapoi.workers.dev/api';
+        let cached = { users: [], logs: [] };
+
+        function checkAdmin() {
+            if (document.getElementById('login-pass').value === 'dr.bofoi1212') {
+                document.getElementById('login-overlay').classList.add('hidden');
+                document.getElementById('sidebar').classList.remove('hidden');
+                document.getElementById('main-ui').classList.remove('hidden');
+                lucide.createIcons();
+                fetchData();
+            } else { alert('Gagal! Password Salah.'); }
+        }
+
+        async function fetchData() {
+            try {
+                const [u, l] = await Promise.all([fetch(`${API_URL}/users`), fetch(`${API_URL}/absensi`)]);
+                cached.users = await u.json();
+                cached.logs = await l.json();
+                render();
+            } catch (e) { console.log("API Error"); }
+        }
+
+        function render() {
+            document.getElementById('stat-total').innerText = cached.users.filter(u => u.role === 'pegawai').length;
+            document.getElementById('stat-present').innerText = cached.logs.length;
+
+            document.getElementById('logs-body').innerHTML = cached.logs.slice(0, 10).map(l => `<tr><td>${l.nama}</td><td>${new Date(l.waktu).toLocaleString()}</td><td>${l.lokasi}</td><td><span style="color:var(--emerald);">Verified</span></td></tr>`).join('');
+            document.getElementById('emps-body').innerHTML = cached.users.filter(u => u.role === 'pegawai').map(u => `<tr><td>${u.nama}</td><td>${u.dept}</td><td>Rp ${u.base_salary.toLocaleString()}</td><td>${u.schedule}</td><td><button style="border:none; background:none; color:var(--rose); cursor:pointer;"><i data-lucide="trash-2" style="width:14px;"></i></button></td></tr>`).join('');
+            document.getElementById('archive-body').innerHTML = cached.logs.map(l => `<tr><td>${l.nama}</td><td>${l.waktu}</td><td>${l.lokasi}</td></tr>`).join('');
+            lucide.createIcons();
+        }
+
+        function switchView(v) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('view-' + v).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('nav-' + v).classList.add('active');
+            document.title = "Admin - " + v.toUpperCase();
+        }
+
+        document.getElementById('login-pass').addEventListener('keypress', (e) => { if (e.key === 'Enter') checkAdmin(); });
+    </script>
+</body>
+
+</html>
